@@ -54,8 +54,10 @@ public class SecurityConfig {
             .sessionFixation()
             .changeSessionId()
             .sessionAuthenticationStrategy(sessionstrategy())
+            /*
             .maximumSessions(1)
             .maxSessionsPreventsLogin(true)
+            */
             //.sessionRegistry(sessionRegistry())
             //.expiredSessionStrategy(new MySessionInformationExpiredStrategy())
             //.expiredUrl("/error/expired")
