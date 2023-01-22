@@ -24,8 +24,15 @@ public class CustomConcurrentSessionControlAuthenticationStrategy extends Concur
     
     @Override
     public void onAuthentication(Authentication authentication, HttpServletRequest httpServletRequest,HttpServletResponse httpServletResponse) {
-        //List<SessionInformation> sessions = this.sessionRegistry.getAllSessions(authentication.getPrincipal(), false);
-        //int allowdNum = getMaximumSessionsForThisUser(authentication);
+
+        List<SessionInformation> sessionInfoList = this.sessionRegistry.getAllSessions(authentication.getPrincipal(), true);
+        this.sessionRegistry.refreshLastRequest(httpServletRequest.getSession().getId());
+        for( int i=0; i<sessionInfoList.size(); i++) {
+            SessionInformation info = sessionInfoList.get(i);
+            if(info.isExpired()){
+                this.sessionRegistry.removeSessionInformation(info.getSessionId());
+            }
+        }
 
         LoginUserDetails userDetails = (LoginUserDetails)authentication.getPrincipal();
         List<Object> principals = this.sessionRegistry.getAllPrincipals();
@@ -33,7 +40,11 @@ public class CustomConcurrentSessionControlAuthenticationStrategy extends Concur
             if (p instanceof LoginUserDetails) {
                 LoginUserDetails u = (LoginUserDetails)p;
                 if(userDetails.getUsername().equals(u.getUsername())){
-                    throw new SessionAuthenticationException("おーばー");
+                    if( u.isCredentialsNonExpired() ){
+                        throw new SessionAuthenticationException("おーばー");
+                    } else {
+                        //this.sessionRegistry.removeSessionInformation(userDetails.();
+                    }
                 }
             }
         }
