@@ -27,15 +27,13 @@ public class CustomConcurrentSessionControlAuthenticationStrategy extends Concur
         //List<SessionInformation> sessions = this.sessionRegistry.getAllSessions(authentication.getPrincipal(), false);
         //int allowdNum = getMaximumSessionsForThisUser(authentication);
 
-        if (authentication.getPrincipal() instanceof LoginUserDetails) {
-            LoginUserDetails userDetails = (LoginUserDetails)authentication.getPrincipal();
-            List<Object> principals = this.sessionRegistry.getAllPrincipals();
-            for( Object p : principals ){
-                if (p instanceof LoginUserDetails) {
-                    LoginUserDetails u = (LoginUserDetails)p;
-                    if( userDetails.getUsername().equals(u.getUsername())){
-                        throw new SessionAuthenticationException("おーばー");
-                    }
+        LoginUserDetails userDetails = (LoginUserDetails)authentication.getPrincipal();
+        List<Object> principals = this.sessionRegistry.getAllPrincipals();
+        for( Object p : principals ){
+            if (p instanceof LoginUserDetails) {
+                LoginUserDetails u = (LoginUserDetails)p;
+                if(userDetails.getUsername().equals(u.getUsername())){
+                    throw new SessionAuthenticationException("おーばー");
                 }
             }
         }

@@ -17,10 +17,6 @@ implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
             org.springframework.security.core.AuthenticationException exception) throws IOException, ServletException {
-                String forwardUrl = "/";
-
-                RequestDispatcher dispatch = request.getRequestDispatcher(forwardUrl);
-                dispatch.forward(request, response);
-        
+            //response.sendRedirect("/");        
     }
 }
