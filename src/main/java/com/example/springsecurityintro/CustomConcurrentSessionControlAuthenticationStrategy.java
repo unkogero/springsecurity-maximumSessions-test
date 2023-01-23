@@ -25,16 +25,39 @@ public class CustomConcurrentSessionControlAuthenticationStrategy extends Concur
     @Override
     public void onAuthentication(Authentication authentication, HttpServletRequest httpServletRequest,HttpServletResponse httpServletResponse) {
 
-        List<SessionInformation> sessionInfoList = this.sessionRegistry.getAllSessions(authentication.getPrincipal(), true);
+        LoginUserDetails userDetails = (LoginUserDetails)authentication.getPrincipal();
+
         this.sessionRegistry.refreshLastRequest(httpServletRequest.getSession().getId());
-        for( int i=0; i<sessionInfoList.size(); i++) {
-            SessionInformation info = sessionInfoList.get(i);
-            if(info.isExpired()){
-                this.sessionRegistry.removeSessionInformation(info.getSessionId());
+
+        List<Object> plist = this.sessionRegistry.getAllPrincipals();
+        for( Object p : plist ){
+            if (p instanceof LoginUserDetails) {
+                List<SessionInformation> list = this.sessionRegistry.getAllSessions(p, true);
+                for( int i=0; i<list.size(); i++) {
+                    SessionInformation info = list.get(i);
+                    this.sessionRegistry.refreshLastRequest(info.getSessionId());
+                    // ここしょうがないので自分で時間判定すればよいかも★
+                    if(info.isExpired()){
+                        this.sessionRegistry.removeSessionInformation(info.getSessionId());
+                    }
+                }
             }
         }
 
-        LoginUserDetails userDetails = (LoginUserDetails)authentication.getPrincipal();
+        List<Object> plist2 = this.sessionRegistry.getAllPrincipals();
+        for( Object p : plist2 ){
+            if (p instanceof LoginUserDetails) {
+                List<SessionInformation> list = this.sessionRegistry.getAllSessions(p, true);
+                for( int i=0; i<list.size(); i++) {
+                    SessionInformation info = list.get(i);
+                    if(info.isExpired()){
+                        this.sessionRegistry.removeSessionInformation(info.getSessionId());
+                    }
+                }
+            }
+        }
+
+        //LoginUserDetails userDetails = (LoginUserDetails)authentication.getPrincipal();
         List<Object> principals = this.sessionRegistry.getAllPrincipals();
         for( Object p : principals ){
             if (p instanceof LoginUserDetails) {
